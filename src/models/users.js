@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
-const Users = mongoose.model('Users',{
+const userSchema = new mongoose.Schema({
   name:{
     type: String,
     required: true,
@@ -38,6 +39,22 @@ const Users = mongoose.model('Users',{
       }
     }
   }
-});
+})
 
-module.exports = Users
+userSchema.pre('save',async function(next){ 
+  //using old function format cause arrow function doesnot have access to 'this'
+  const user = this;
+
+  if(user.isModified('password')){
+    user.password = await bcrypt.hash(user.password,10);
+  }
+  
+
+  next(); //is strictly needed to continue the program else it will remain stuck here
+})
+
+
+
+const Users = mongoose.model('Users',userSchema);
+
+module.exports = Users;
