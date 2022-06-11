@@ -11,48 +11,83 @@ app.use(express.json()); //converts json response into object
 // GET REQUEST HANDLERS
 
 //Get All Users
-app.get('/users',(req,res)=>{
-  Users.find().then((result)=>{
-    res.send(result)
-  }).catch((error)=>{
+app.get('/users',async(req,res)=>{
+   try{
+    const result = await Users.find();
+    res.send(result);
+   }catch(e){
     res.status(500).send();
-  })
+   }
+
 })
 
 // Get User by ID
-app.get('/users/:id',(req,res)=>{
+app.get('/users/:id',async(req,res)=>{
   const id = req.params.id;
-  Users.findById(id).then((result)=>{
+    
+  try{
+    const result = await Users.findById(id);
     if(!result){
       return res.status(404).send();
     }
     res.send(result);
-
-  }).catch((error)=>{
+  }catch(e){
     res.status(500).send();
-  })
+  }
+
+})
+
+//Get all Tasks
+app.get('/tasks',async(req,res)=>{
+  try{
+    const result = await Tasks.find();
+    res.send(result);
+  }catch(e){
+    res.status(500).send();
+  }
+  
+})
+
+//Get one task by id
+app.get('/tasks/:id',async(req,res)=>{
+  const id = req.params.id;
+
+  try{
+    const result = await Tasks.findById(id);
+    if(!result){
+      return res.status(404).send();
+    }
+    res.send(result);
+  }catch(e){
+    res.status(500).send();
+  }
+  
 })
 
 // POST REQUEST HANDLERS
 
 //Post request for users
-app.post('/users',(req,res)=>{
+app.post('/users',async (req,res)=>{
   const user = new Users(req.body)
-  user.save().then((result)=>{
+  try{
+    const result= await user.save();
     res.status(201).send(result);
-  }).catch((error)=>{
-    res.status(400).send(error);
-  })
+  }catch(e){
+    res.status(400).send(e);
+  }
 })
 
 //Post request for tasks
-app.post('/tasks',(req,res)=>{
+app.post('/tasks',async (req,res)=>{
   const task = new Tasks(req.body)
-  task.save().then((result)=>{
+
+  try{
+    const result = await task.save();
     res.status(201).send(result);
-  }).catch((error)=>{
-    res.status(400).send(error);
-  })
+  }catch(e){
+    res.status(400).send(e);
+  }
+
 })
 
 app.listen(port,()=>{
