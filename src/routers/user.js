@@ -1,16 +1,11 @@
 const express = require('express');
-const Users = require('../models/users')
+const Users = require('../models/users');
+const auth = require('../middleware/auth')
 const router = new express.Router();
 
 
-router.get('/users',async(req,res)=>{
-  try{
-   const result = await Users.find();
-   res.send(result);
-  }catch(e){
-   res.status(500).send();
-  }
-
+router.get('/users/me',auth,async(req,res)=>{
+  res.send(req.authorizedUser);
 })
 
 router.get('/users/:id',async(req,res)=>{
@@ -23,7 +18,7 @@ router.get('/users/:id',async(req,res)=>{
     }
     res.send(result);
   }catch(e){
-    res.status(500).send();
+    res.status(500).send(e);
   }
 
 })
@@ -31,8 +26,20 @@ router.get('/users/:id',async(req,res)=>{
 router.post('/users',async (req,res)=>{
   const user = new Users(req.body)
   try{
+    
     const result= await user.save();
-    res.status(201).send(result);
+    const token = await user.generateAuthToken();
+    res.status(201).send({result,token});
+  }catch(e){
+    res.status(400).send(e);
+  }
+})
+
+router.post('/users/login',async(req,res)=>{
+  try{
+    const user = await Users.getByCredentials(req.body.email,req.body.password);
+    const token = await user.generateAuthToken();
+    res.send({user,token});
   }catch(e){
     res.status(400).send(e);
   }
@@ -42,7 +49,7 @@ router.patch('/users/:id',async(req,res)=>{
   const updates = Object.keys(req.body);
   const validUpdates=['name','email','age','password'];
   const isValid = updates.every((key)=> validUpdates.includes(key));
-  
+
   if(!isValid){
     return res.status(400).send({error:"Invalid Update"});
   }
