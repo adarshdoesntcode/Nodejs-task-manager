@@ -11,8 +11,8 @@ const auth = async (req,res,next)=>{
     if(!user){
       throw new Error();
     }
-
-    req.authorizedUser=user;
+    req.authorizedToken = token;
+    req.authorizedUser = user;
     next();
   }catch(e){
     res.status(401).send("Unauthorized!!")
