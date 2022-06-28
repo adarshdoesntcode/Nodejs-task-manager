@@ -1,6 +1,6 @@
 const express = require('express');
 const Users = require('../models/users');
-const auth = require('../middleware/auth')
+const auth = require('../middleware/auth');
 const router = new express.Router();
 
 
@@ -18,6 +18,7 @@ router.post('/users',async (req,res)=>{
   }
 })
 
+
 //--------------LOG IN---------------
 
 router.post('/users/login',async(req,res)=>{
@@ -30,11 +31,13 @@ router.post('/users/login',async(req,res)=>{
   }
 })
 
+
 //--------------GET PROFILE---------------
 
 router.get('/users/me',auth,async(req,res)=>{
   res.send(req.authorizedUser);
 })
+
 
 //--------------LOG OUT---------------
 
@@ -45,11 +48,12 @@ router.post('/users/logout',auth, async(req,res)=>{
     })
 
     await req.authorizedUser.save();
-    res.send("Logged out")
+    res.send("Logged out");
   }catch(e){
     res.send(500).send();
   }
 })
+
 
 //--------------LOGOUT ALL---------------
 
@@ -63,6 +67,7 @@ router.post('/users/logoutAll',auth, async(req,res)=>{
     res.send(500).send();
   }
 })
+
 
 //--------------UPDATE USER---------------
 
@@ -85,7 +90,9 @@ router.patch('/users/me',auth,async(req,res)=>{
 
 })
 
+
 //--------------DELETE USER---------------
+
 router.delete('/users/me',auth,async(req,res)=>{
   try{
     await req.authorizedUser.remove()
