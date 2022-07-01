@@ -23,8 +23,9 @@ router.post('/tasks',auth,async (req,res)=>{
 
 
 // -----------------GET ALL TASK ----------------
-// tasks?completed=true/false
-// tasks?limit=2&skip=0
+// GET: tasks?completed=true/false
+// GET: tasks?limit=2&skip=0
+// GET: tasks?sortBy=createdAt:desc
 router.get('/tasks',auth,async(req,res)=>{
 
   const match={}
