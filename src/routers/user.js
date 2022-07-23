@@ -1,18 +1,22 @@
 const express = require('express');
-const Users = require('../models/users');
-const auth = require('../middleware/auth');
-const router = new express.Router();
+const mongoose = require('mongoose');
 const multer = require('multer');
 const sharp = require('sharp');
 
+const Users = require('../models/users');
+const auth = require('../middleware/auth');
+const {sendWelcomeEmail, sendGoodbyeEmail} = require('../email/account');
+
+const router = new express.Router();
 
 //--------------SIGN UP---------------
 
-router.post('/users',async (req,res)=>{
+router.post('/users/',async (req,res)=>{
   const user = new Users(req.body)
   try{
     
     const result= await user.save();
+    sendWelcomeEmail(user.email,user.name);
     const token = await user.generateAuthToken();
     res.status(201).send({result,token});
   }catch(e){
@@ -98,6 +102,7 @@ router.patch('/users/me',auth,async(req,res)=>{
 router.delete('/users/me',auth,async(req,res)=>{
   try{
     await req.authorizedUser.remove()
+    sendGoodbyeEmail(req.authorizedUser.email, req.authorizedUser.name);
     res.send(req.authorizedUser);
   }catch(e){
     res.status(500).send(e);
