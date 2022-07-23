@@ -71,6 +71,7 @@ router.post('/users/logoutAll',auth, async(req,res)=>{
     res.send("Logged out All")
   }catch(e){
     res.send(500).send();
+    
   }
 })
 
